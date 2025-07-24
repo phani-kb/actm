@@ -1,0 +1,12 @@
+# To install/upgrade the dependencies, run the following commands:
+# pip install -r requirements.txt
+# pip install -r requirements.txt --upgrade
+
+# Development dependencies
+pytest~=8.2.1
+pytest-cov
+ruff
+mypy
+coverage
+codespell
+pylint

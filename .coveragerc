@@ -1,0 +1,18 @@
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    @abstractmethod
+[run]
+omit =
+    */__init__.py
+    */tests/*
+    */test_*
+    */setup.py
+    */venv/*
+    */.tox/*
+    */.eggs/*
+    */.git/*
+    */.mypy_cache/*
+    */.pytest_cache
+    /usr/*

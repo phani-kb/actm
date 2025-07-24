@@ -1,0 +1,52 @@
+[project]
+name = "actm"
+version = "0.1.0"
+description = "A CLI tool to export activity listings from the Active Mississauga website, supporting filters and multiple output formats."
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 99
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E", # General syntax and code style rules
+    "F", # Pyflakes rules for unused imports, undefined names
+    "I", # isort rules for imports ordering
+    "TYP", # Type hinting rules
+    "N", # Naming conventions
+    "B", # Best practice rules
+    "D", # Docstring conventions
+    "SIM", # Simplifications and code smell checks
+    "ERA", # Eradicate rules for unused/dead code
+    "C", # Complexity rules
+    "W", # Warnings
+    "R", # Refactoring opportunities
+]
+exclude = ["tests/*", "build/*", "dist/*", "*.txt"]
+ignore = ["D"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 99
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 72
+
+
+[tool.codespell]
+skip = [
+    "pyproject.toml", "LICENSE", "*.txt",
+]
+ignore-words = [
+  "pyproject",
+  "toml",
+]
+write-changes = true
+
+[tool.pytest.ini_options]
+pythonpath = "src"
