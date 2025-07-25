@@ -21,7 +21,7 @@ from actm.common.config_reader import logger
 @click.option("--output-folder", type=click.Path(), help="Path to the output folder.")
 @click.pass_context
 def actmtoolbox():
-    """CLI tool for Active Mississauga."""
+    """Export activity listings from Active Mississauga."""
     logger.info("ACTM initialized.")
 
 
@@ -32,7 +32,11 @@ def download():
     """Download data from the website."""
 
 
-if __name__ == "__main__":
+def main():
+    """Run the ACTM toolbox."""
     actmtoolbox()
     logger.info("Active Mississauga Toolbox completed.")
-    logger.shutdown()
+
+
+if __name__ == "__main__":
+    main()

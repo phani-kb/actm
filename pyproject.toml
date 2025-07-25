@@ -1,9 +1,6 @@
-[project]
-name = "actm"
-version = "0.1.0"
-description = "A CLI tool to export activity listings from the Active Mississauga website, supporting filters and multiple output formats."
-readme = "README.md"
-requires-python = ">=3.10"
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 99
@@ -37,7 +34,6 @@ max-complexity = 15
 docstring-code-format = true
 docstring-code-line-length = 72
 
-
 [tool.codespell]
 skip = [
     "pyproject.toml", "LICENSE", "*.txt",
@@ -50,3 +46,21 @@ write-changes = true
 
 [tool.pytest.ini_options]
 pythonpath = "src"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+    "@abstractmethod",
+    "if TYPE_CHECKING:"
+]
+ignore_errors = true
