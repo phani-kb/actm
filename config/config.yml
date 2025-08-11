@@ -1,51 +1,47 @@
 application:
-  name: "actm"
-  version: "0.1.0"
-  description: "A CLI tool to export activity listings from the Active Mississauga website, supporting filters and multiple output formats."
-log_config_file: "config/logging.yml"
-web_driver: "/usr/bin/chromedriver" # path to chromedriver
-
+  name: 'actm'
+  version: '0.1.0'
+  description: 'A tool to export activity listings from the Active Mississauga website.'
+log_config_file: 'config/logging.yml'
+web_driver: '/usr/bin/chromedriver' # path to chromedriver
 input:
-  folder: "data/input"
+  folder: 'data/input'
   files:
-
 output:
-  folder: "data/output"
-
-home_url: "https://activemississauga.ca/"
-
+  folder: 'data/output'
+home_url: 'https://anc.ca.apm.activecommunities.com/activemississauga/activity/search?onlineSiteId=0&activity_select_param=2&viewMode=list'
 filters:
   activities:
-    save_format: "csv"
+    save_format: 'csv'
     when:
       session_checkboxes:
-        - "2025"
+        - '2025'
       days_of_week:
-        - "Monday"
-        - "Tuesday"
-        - "Wednesday"
-        - "Thursday"
-        - "Friday"
-        - "Saturday"
-        - "Sunday"
-      status: "Future"
+        - 'Monday'
+        - 'Tuesday'
+        - 'Wednesday'
+        - 'Thursday'
+        - 'Friday'
+        - 'Saturday'
+        - 'Sunday'
+      status: 'Future'
       skip_single_date: true
-    who:
-      age_from: 10
-      age_to: 10
+    who: # replace with actual age groups to filter
+      age_from: 7
+      age_to: 8
       skip_all_ages: true
-#    where:
-#      locations:
-#        - "Community Centre" # replace with actual location names to filter
-#        - "Community Library" # replace with actual location names to filter
+    #    where:
+    #      locations:
+    #        - "Community Centre" # replace with actual location names to filter
+    #        - "Community Library"
     name:
-      not_contains:
-        - "Extended Hours"
-        - "Private Lessons"
-        - "Preschool"
-        - "Lane Swim"
-        - "Fun Swim"
-        - "Parent & Tot Swim"
-        - "Swim For Life Parent & Tot"
-        - "Drop In"
-        - "Drop-In"
+      not_contains: # replace with actual names to filter
+        - 'Extended Hours'
+        - 'Private Lessons'
+        - 'Preschool'
+        - 'Lane Swim'
+        - 'Fun Swim'
+        - 'Parent & Tot Swim'
+        - 'Swim For Life Parent & Tot'
+        - 'Drop In'
+        - 'Drop-In'

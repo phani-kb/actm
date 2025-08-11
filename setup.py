@@ -28,7 +28,7 @@ def read_dev_requirements():
 setup(
     name="actm",
     version="0.1.0",
-    description="A CLI tool to export activity listings from the Active Mississauga website.",
+    description="A tool to export activity listings from the Active Mississauga website.",
     author="Phani K",
     author_email="192951055+phani-kb@users.noreply.github.com",
     url="https://github.com/phani-kb/actm",
