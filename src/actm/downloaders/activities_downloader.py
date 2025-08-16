@@ -1,6 +1,7 @@
-"""Scraper for activities."""
+"""Downloader for activities."""
 
 import os
+import sys
 import time
 
 from bs4 import BeautifulSoup
@@ -21,7 +22,7 @@ from actm.common.constants import (
     SEARCH_WAIT_TIME,
 )
 from actm.common.enums import DataSaveFormat, DownloadType
-from actm.scrapers.base_scraper import BaseScraper, parse_age_range, save_page_source
+from actm.downloaders.base_downloader import BaseDownloader, parse_age_range, save_page_source
 
 
 def should_skip_activity_date_based(date_range, filters):
@@ -146,8 +147,8 @@ def extract_activities_from_page_source(file_path, filters):
     return activities, skipped_activities
 
 
-class ActivitiesScraper(BaseScraper):
-    """Scraper for activities."""
+class ActivitiesDownloader(BaseDownloader):
+    """Downloader for activities."""
 
     def __init__(self, driver, output_folder, headless=True):
         super().__init__(driver, output_folder, DownloadType.ACTIVITIES, headless=headless)
@@ -174,12 +175,17 @@ class ActivitiesScraper(BaseScraper):
         self._max_age = value
 
     def download_activities(self, url: str, save_format: DataSaveFormat, filters: dict):
-        logger.info("Scraping activities...")
+        logger.info("Downloading activities...")
         try:
             self.driver.get(url)
             wait = WebDriverWait(self.driver, LOAD_WAIT_TIME)
             wait.until(EC.presence_of_element_located((By.ID, "app-root")))
 
+            wait.until(
+                EC.invisibility_of_element_located((By.CLASS_NAME, "loading-bar__outer-box"))
+            )
+
+            logger.info("Clicking on the Activities menu...")
             activities_menu = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Activities")))
             activities_menu.click()
 
@@ -188,12 +194,13 @@ class ActivitiesScraper(BaseScraper):
             wait.until(
                 EC.invisibility_of_element_located((By.CLASS_NAME, "loading-bar__outer-box"))
             )
+            logger.info("Activities page loaded.")
 
             self.apply_when_filter(filters)
             self.apply_who_filter(filters)
             self.apply_where_filter(filters)
 
-            # get the total number of activities to be scraped
+            # get the total number of activities to be downloaded
             total_activities = wait.until(
                 EC.presence_of_element_located(
                     (
@@ -209,6 +216,7 @@ class ActivitiesScraper(BaseScraper):
             logger.info("Scrolled to the bottom of the page")
             time.sleep(SEARCH_WAIT_TIME)
 
+            logger.info("Saving page source...")
             page_source = self.driver.page_source
             ps_file_path = self.get_page_source_file_path()
             save_page_source(page_source, ps_file_path, True)
@@ -219,16 +227,17 @@ class ActivitiesScraper(BaseScraper):
             self.driver.save_screenshot(screenshot_file_path)
             logger.info("Saved the full page screenshot to a file: %s", screenshot_file_path)
 
+            logger.info("Extracting data from page source...")
             activities, skipped_activities = extract_activities_from_page_source(
                 ps_file_path, filters
             )
             self.save_data(activities, save_format)
             self.save_skipped_data(skipped_activities, save_format)
         except Exception as e:  # pylint: disable=broad-except
-            logger.error("Error scraping activities: %s", e)
+            logger.error("Error downloading activities: %s", e)
         finally:
             self.driver.quit()
-            logger.info("Activities scraping complete")
+            logger.info("Activities download complete")
 
     def apply_when_filter(self, filters: dict):
         """Apply the 'When' filter based on the provided filters."""
@@ -241,6 +250,7 @@ class ActivitiesScraper(BaseScraper):
         if not len(filters["when"]["session_checkboxes"]) > 0:
             return
 
+        logger.info("Applying 'When' filter...")
         wait = WebDriverWait(self.driver, LOAD_WAIT_TIME)
         when_filter = wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, '[aria-label="Filter When selected"]'))
@@ -300,6 +310,7 @@ class ActivitiesScraper(BaseScraper):
             logger.info("Clicked Status radio button")
 
         self.click_apply_button()
+        logger.info("'When' filter applied.")
 
     def apply_who_filter(self, filters: dict):
         """Apply the 'Who' filter based on the provided filters."""
@@ -309,6 +320,7 @@ class ActivitiesScraper(BaseScraper):
         if "age_from" not in filters["who"] and "age_to" not in filters["who"]:
             return
 
+        logger.info("Applying 'Who' filter...")
         wait = WebDriverWait(self.driver, LOAD_WAIT_TIME)
         who_filter = wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, '[aria-label="Filter Who unselected"]'))
@@ -341,6 +353,7 @@ class ActivitiesScraper(BaseScraper):
             print(f"Age to: {filters['who']['age_to']}")
 
         self.click_apply_button()
+        logger.info("'Who' filter applied.")
 
     def apply_where_filter(self, filters: dict):
         """Apply the 'Where' filter based on the provided filters."""
@@ -353,10 +366,20 @@ class ActivitiesScraper(BaseScraper):
         if not len(filters["where"]["locations"]) > 0:
             return
 
+        logger.info("Applying 'Where' filter...")
         wait = WebDriverWait(self.driver, LOAD_WAIT_TIME)
-        where_filter = wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, '[aria-label="Filter Where unselected"]'))
-        )
+        try:
+            where_filter = wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, '[aria-label="Filter Where unselected"]')
+                )
+            )
+        except Exception:
+            where_filter = wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, '[aria-label="Filter Where selected"]')
+                )
+            )
         where_filter.click()
         logger.info("Clicked Where filter")
         time.sleep(LOAD_WAIT_TIME5)
@@ -395,6 +418,7 @@ class ActivitiesScraper(BaseScraper):
         self.click_apply_button()
 
         logger.info("Applied where filter")
+        logger.info("'Where' filter applied.")
 
     def scroll_to_bottom(self):
         """Scroll to the bottom of the page and count the number of pages and time taken."""
@@ -411,9 +435,10 @@ class ActivitiesScraper(BaseScraper):
             old_position = new_position
             page_count += 1
 
-            if page_count % 10 == 0:
-                print(f"Pages scrolled: {page_count}")
+            sys.stdout.write(f"\rPages scrolled: {page_count}")
+            sys.stdout.flush()
 
+        print()
         end_time = time.time()
         time_taken = end_time - start_time
 

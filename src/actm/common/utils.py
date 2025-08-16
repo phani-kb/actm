@@ -58,5 +58,5 @@ def get_user_agent(app_config: Optional[Dict[str, Any]]) -> str:
     app_desc = app_config.get("description", constants.APP_DESCRIPTION)
     logger.debug("App Name: %s, App Version: %s, App Description: %s", app_name, app_ver, app_desc)
     user_agent = f"{app_name}/{app_ver} ({app_desc})"
-    logger.info("User Agent: %s", user_agent)
+    logger.debug("User Agent: %s", user_agent)
     return user_agent

@@ -4,9 +4,7 @@
 
 # Development dependencies
 pytest~=8.2.1
-pytest-cov
 ruff
 mypy
-coverage
 codespell
 pylint

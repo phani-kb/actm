@@ -1,4 +1,4 @@
-"""Base class for web scrapers."""
+"""Base class for web downloaders."""
 
 import os
 from abc import ABC, abstractmethod
@@ -7,14 +7,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
-from actm.common import utils
 from actm.common.config_reader import logger
 from actm.common.constants import ALL_AGES_MAX, ALL_AGES_MIN
 from actm.common.enums import DataSaveFormat, DownloadType
 
 
-class IWebScraper(ABC):
-    """Interface for web scrapers."""
+class IWebDownloader(ABC):
+    """Interface for web downloaders."""
 
     @abstractmethod
     def pre_process(self):
@@ -100,10 +99,13 @@ def _save_to_file(data, file_path, save_format: DataSaveFormat):
                 import csv  # pylint: disable=import-outside-toplevel
 
                 writer = csv.writer(file)
-                headers = data[0].keys()
-                writer.writerow(headers)
-                for row in data:
-                    writer.writerow(row.values())
+                if data:
+                    headers = data[0].keys()
+                    writer.writerow(headers)
+                    for row in data:
+                        writer.writerow(row.values())
+                else:
+                    logger.warning("No data to save to CSV: %s", file_path)
             else:
                 file.write("\n".join(data))
         logger.info("Data saved to file: %s", file_path)
@@ -111,8 +113,8 @@ def _save_to_file(data, file_path, save_format: DataSaveFormat):
         logger.error("Error saving data: %s", e)
 
 
-class BaseScraper(IWebScraper, ABC):
-    """Base class for web scrapers."""
+class BaseDownloader(IWebDownloader, ABC):
+    """Base class for web downloaders."""
 
     def __init__(self, driver, output_folder, dtype: DownloadType, headless=True):
         chrome_options = Options()
@@ -139,16 +141,8 @@ class BaseScraper(IWebScraper, ABC):
         filters: dict,
     ):
         """Download the data based on the download type."""
-        user_agent = utils.get_user_agent(
-            {
-                "name": "Active Mississauga Toolbox",
-                "version": "1.0.0",
-                "description": "A tool to export activity listings from the Active Mississauga website.",  # noqa: E501
-            }
-        )
-        if not user_agent:
-            user_agent = "Active Mississauga Toolbox/1.0.0 (A tool to export activity listings from the Active Mississauga website.)"  # noqa: E501
-        logger.info("User agent: %s", user_agent)
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"  # noqa: E501
+        logger.debug("User agent: %s", user_agent)
         try:
             self.driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": user_agent})
             if download_type == DownloadType.ACTIVITIES:
@@ -166,6 +160,7 @@ class BaseScraper(IWebScraper, ABC):
 
     def get_page_source_file_path(self):
         """Get the file path for the page source."""
+        os.makedirs(self.output_folder, exist_ok=True)
         return f"{self.output_folder}/page_source.html"
 
     def get_skipped_file_name(self, save_format: DataSaveFormat):
@@ -187,15 +182,15 @@ class BaseScraper(IWebScraper, ABC):
         _save_to_file(skipped_activities, file_path, save_format)
 
 
-class ScraperFactory:
-    """Factory class for creating scraper instances."""
+class DownloaderFactory:
+    """Factory class for creating downloader instances."""
 
     @staticmethod
-    def get_scraper(driver, dtype: DownloadType, output_folder) -> IWebScraper:
-        """Get the appropriate scraper for the given download type."""
+    def get_downloader(driver, dtype: DownloadType, output_folder) -> IWebDownloader:
+        """Get the appropriate downloader for the given download type."""
 
         if dtype == DownloadType.ACTIVITIES:
-            from actm.scrapers.activities_scraper import ActivitiesScraper
+            from actm.downloaders.activities_downloader import ActivitiesDownloader
 
-            return ActivitiesScraper(driver, output_folder)
+            return ActivitiesDownloader(driver, output_folder)
         return None  # type: ignore
