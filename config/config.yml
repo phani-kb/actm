@@ -26,16 +26,15 @@ filters:
         - 'Sunday'
       status: 'Future'
       skip_single_date: true
-    who: # replace with actual age groups to filter
-      age_from: 7
-      age_to: 8
+    who: # replace it with actual age groups to filter
+      age_from: 18
+      age_to: 20
       skip_all_ages: true
-    #    where:
-    #      locations:
-    #        - "Community Centre" # replace with actual location names to filter
-    #        - "Community Library"
+    where:
+      locations:
+        - 'Community Centre' # replace with actual location names to filter
     name:
-      not_contains: # replace with actual names to filter
+      not_contains: # replace it with actual names to filter
         - 'Extended Hours'
         - 'Private Lessons'
         - 'Preschool'
