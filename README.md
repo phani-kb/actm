@@ -8,6 +8,10 @@ A tool to download and export activity listings from the Active Mississauga webs
 - Configurable filters for age, date, and other criteria
 - Command-line interface for easy automation
 
+## Demo
+
+![Demo](assets/demo-actm.gif){ width=300 }
+
 ## Installation
 
 1. Clone the repository:
