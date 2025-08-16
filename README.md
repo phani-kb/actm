@@ -1,4 +1,4 @@
-# ACTM
+# actm
 
 A tool to download and export activity listings from the Active Mississauga website, supporting filters and multiple output formats.
 
@@ -10,7 +10,7 @@ A tool to download and export activity listings from the Active Mississauga webs
 
 ## Demo
 
-<img src="assets/demo-actm.gif" alt="ACTM Demo" width="300">
+<img src="assets/demo-actm.gif" alt="actm Demo" width="300">
 
 ## Installation
 
@@ -67,7 +67,7 @@ Commands:
    download  Download data from the website.
 ```
 
-## License & Disclaimer for ACTM
+## License & Disclaimer for actm
 
 ## 1. License
 
