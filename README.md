@@ -10,7 +10,7 @@ A tool to download and export activity listings from the Active Mississauga webs
 
 ## Demo
 
-![Demo](assets/demo-actm.gif){ width=300 }
+<img src="assets/demo-actm.gif" alt="ACTM Demo" width="300">
 
 ## Installation
 
