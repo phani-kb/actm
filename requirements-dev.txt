@@ -3,7 +3,7 @@
 # pip install -r requirements.txt --upgrade
 
 # Development dependencies
-pytest~=8.2.1
+pytest~=9.1.1
 ruff
 mypy
 codespell
